@@ -1,0 +1,95 @@
+<html>
+  <body>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.9.3/Chart.bundle.js"></script>
+    <button type="button" onclick="startSort()">Start Sorting</button>
+    <div><canvas id="myChart" height="80"></canvas></div>
+    <div id="debug">tried</div>
+
+    <script>
+      let total = 10;
+      let tryed = 0; // let로 선언
+      let randomArray, sortedArray, myChart;
+      let isSorting = false;
+
+      // 차트 초기화
+      function initChart() {
+        let ctx = document.getElementById('myChart').getContext('2d');
+        myChart = new Chart(ctx, {
+          type: 'line',
+          data: {
+            labels: [],
+            datasets: [
+              {
+                label: 'Random Numbers',
+                data: [],
+                borderColor: 'black',
+                backgroundColor: 'rgba(255, 99, 132, 0.1)',
+              },
+              {
+                label: 'Sorted Numbers',
+                data: [],
+                borderColor: 'blue',
+                backgroundColor: 'rgba(54, 162, 235, 0.1)',
+              }
+            ]
+          },
+          options: {}
+        });
+      }
+
+      // 숫자 생성 및 차트 데이터 초기화
+      function generateRandomNumbers() {
+        randomArray = myChart.data.datasets[0].data;
+        sortedArray = myChart.data.datasets[1].data;
+
+        for (let i = 0; i < total; i++) {
+          let num = Math.floor(Math.random() * 100);
+          myChart.data.labels[i] = i;
+          randomArray[i] = num;
+          sortedArray[i] = num;
+        }
+
+        myChart.update();
+      }
+
+      // Sorting 함수 (버블 정렬) - Delay를 넣어서 애니메이션처럼 보이게 만들기
+      function startSort() {
+        if (isSorting) return; // 이미 정렬 중이라면 함수 종료
+
+        isSorting = true; // 정렬 중
+        let i = 0; // 정렬 시작 위치
+        let j = 0; // 비교 위치
+
+        // 버블 정렬을 진행하면서 차트 업데이트
+        function bubbleSortStep() {
+          if (i < sortedArray.length - 1) {
+            if (j < sortedArray.length - 1 - i) {
+              if (sortedArray[j] > sortedArray[j + 1]) {
+                // Swap
+                let tmp = sortedArray[j];
+                sortedArray[j] = sortedArray[j + 1];
+                sortedArray[j + 1] = tmp;
+                myChart.update(); // 차트 업데이트
+              }
+              j++;
+              setTimeout(bubbleSortStep, 50); // 다음 비교를 50ms 후에 실행
+            } else {
+              j = 0; // 내림차순 정렬을 한 후, 다음 패스 시작
+              i++;
+              setTimeout(bubbleSortStep, 50); // 다음 패스로 넘어가기 전에 50ms 대기
+            }
+          } else {
+            isSorting = false; // 정렬 완료
+          }
+        }
+
+        // 정렬 시작
+        bubbleSortStep();
+      }
+
+      // 차트 초기화 및 랜덤 숫자 생성
+      initChart();
+      generateRandomNumbers();
+    </script>
+  </body>
+</html>
